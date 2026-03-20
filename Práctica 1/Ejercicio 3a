@@ -7,6 +7,8 @@ Algunos empleados pueden ingresan el DNI con valor 0, lo
 que significa que al momento de la carga puede no tenerlo.
 La carga finaliza cuando se ingresa el String ‘fin’ como apellido.}
 program ejercicio3aPractica1;
+const
+	corte = 'fin';
 type
     empleado = record
              numero: integer;
@@ -16,14 +18,43 @@ type
              dni: integer;
     end;
     archivo_empleados = file of empleado;
+    
     procedure leer(var e: empleado);
     begin
-         readln(e.numero);
-         readln(e.apellido);
-         readln(e.nombre);
-         readln(e.edad);
-         readln(e.dni);
+		writeln('Ingrese el apellido del empleado: ');
+		readln(e.apellido);
+		if (e.apellido  <> corte) then begin
+			writeln('Ingrese el numero del empleado: ');
+			readln(e.numero);
+			writeln('Ingrese el nombre del empleado: ');
+			readln(e.nombre);
+			writeln('Ingrese la edad del empleado: ');
+			readln(e.edad);
+			writeln('Ingrese el dni del empleado: ');
+			readln(e.dni);
+		end;
     end;
+    procedure cargar(var emp: empleados);
+    var
+		e: empleado;
+	begin
+		leer(e);
+		while (e.apellido <> corte) do begin
+			write(emp, e);
+			leer(e);
+		end;
+		close(emp);
+	end;
+var
+	empleados: archivo_empleados;
+	nombre_fisico: string;
+	e: empleado;
 begin
-
+	writeln('Ingrese el nombre físico del archivo de carga: ');
+	readln(nombre_fisico);
+	assign(empleados, nombre_fisico);
+	rewrite(empleados);
+	cargar(emp);
 end.
+
+

@@ -105,37 +105,6 @@ begin
     close(arc);
 end;
 
-procedure menu(var arc: archivo_empleados);
-var 
-    opcion: integer;
-begin
-    writeln('Las opciones a elegir son las siguientes: ');
-    writeln('Opción 1: listar en pantalla los datos de empleados que tengan un nombre o apellido determinado');
-    writeln('Opción 2: listar en pantalla los empleados de a uno por línea');
-    writeln('Opción 3: listar en pantalla los empleados mayores a 70 años, próximos a jubilarse');
-    writeln('Opcion 4: agregar uno o mas empleados al final del archivo con sus datos ingresados');
-    writeln('Opcion 5: modificar la edad de un empleado dado');
-    writeln('Opcion 6: exportar el contenido del archivo a un archivo de texto llamado todos_empleados.txt');
-    writeln('Opcion 7: exportar a un archivo de texto llamado: faltaDNIEmpleado.txt, los empleados que no tengan cargado el DNI');
-    writeln('Opcion 8: salir del menú.');
-    readln(opcion);
-    while (opcion <> 8) do begin 
-        case opcion of
-            1: empleadoDeterminado(arc);
-            2: listadoEmpleados(arc);
-            3: empleadosMayores70(arc);
-            4: agregarEmpleado(arc);
-	        5: modificarEdad(arc);
-	        6: exportarContenido(arc);
-	        7: exportarTextoDni(arc);
-        else    
-            writeln('Opción inválida.');
-        end;
-        writeln('Vuelva a ingresar una opción: ');
-        readln(opcion);
-    end;
-end;
-
 procedure agregarEmpleado(var arc: archivo_empleados);
 var
     e: empleado;
@@ -167,6 +136,96 @@ begin
         leer(e);
     end;
     close(arc);
+end;
+
+procedure modificarEdad(var arc: archivo_empleados);
+var
+    e: empleado;
+    num, edadNueva: integer;
+    encontre: boolean;
+begin
+    leer(e);
+    encontre := false;
+    writeln('Ingrese el número de empleado y luego la edad que le quiera modificar: ');
+    readln(num);
+    readln(edadNueva);
+    while (not EOF(arc) and not encontre) do begin 
+        read(arc, e);
+        if (e.numero = num) then begin
+            encontre := true;
+            e.edad := edadNueva;
+            seek(arc, filePos(arc)-1); // RETROCEDEMOS PORQUE EL READ NOS HIZO AVANZAR A OTRA POSICIÓN (1 MÁS)
+            write(arc, e);
+        end;
+    end;
+end;    
+
+procedure exportarContenido(var arc: archivo_empleados);
+var
+    archivo_texto: Text;
+    e: empleado;
+begin
+    reset(arc);
+    assign(archivo_texto, 'todos_empleados.txt');
+    rewrite(archivo_texto);
+    while (not EOF(arc)) do begin 
+        read(arc, e);
+        writeln(archivo_texto, 'Número: ', e.numero, '. Apellido: ', e.apellido, '. Nombre: ',
+        e.nombre, '. Edad: ', e.edad, '. DNI: ', e.dni, '.');
+    end;
+    close(arc);
+    close(archivo_texto);
+end;
+    
+{exportar a un archivo de texto llamado: faltaDNIEmpleado.txt, 
+los empleados que no tengan cargado el DNI');}
+procedure exportarTextoDni(var arc: archivo_empleados);
+var 
+    e: empleado;
+    archivo_texto: Text;
+begin
+    assign(archivo_texto, 'faltaDNIEmpleado.txt');
+    rewrite(archivo_texto);
+    reset(arc);
+    while (not EOF(arc)) do begin 
+        read(arc, e);
+        if (e.dni = 0) then  
+            writeln(archivo_texto, 'Número: ', e.numero, '. Apellido: ', e.apellido, '. Nombre: ',
+            e.nombre, '. Edad: ', e.edad, '. DNI: ', e.dni, '.');
+    end;
+    close(arc);
+    close(archivo_texto);
+end;
+    
+procedure menu(var arc: archivo_empleados);
+var 
+    opcion: integer;
+begin
+    writeln('Las opciones a elegir son las siguientes: ');
+    writeln('Opción 1: listar en pantalla los datos de empleados que tengan un nombre o apellido determinado');
+    writeln('Opción 2: listar en pantalla los empleados de a uno por línea');
+    writeln('Opción 3: listar en pantalla los empleados mayores a 70 años, próximos a jubilarse');
+    writeln('Opcion 4: agregar uno o mas empleados al final del archivo con sus datos ingresados');
+    writeln('Opcion 5: modificar la edad de un empleado dado');
+    writeln('Opcion 6: exportar el contenido del archivo a un archivo de texto llamado todos_empleados.txt');
+    writeln('Opcion 7: exportar a un archivo de texto llamado: faltaDNIEmpleado.txt, los empleados que no tengan cargado el DNI');
+    writeln('Opcion 8: salir del menú.');
+    readln(opcion);
+    while (opcion <> 8) do begin 
+        case opcion of
+            1: empleadoDeterminado(arc);
+            2: listadoEmpleados(arc);
+            3: empleadosMayores70(arc);
+            4: agregarEmpleado(arc);
+	        5: modificarEdad(arc);
+	        6: exportarContenido(arc);
+	        7: exportarTextoDni(arc);
+        else    
+            writeln('Opción inválida.');
+        end;
+        writeln('Vuelva a ingresar una opción: ');
+        readln(opcion);
+    end;
 end;
 
 var

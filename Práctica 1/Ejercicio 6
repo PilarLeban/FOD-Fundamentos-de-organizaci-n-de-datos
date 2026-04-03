@@ -160,6 +160,29 @@ begin
     close(arc);
 end;
 
+// 6C
+// c. Exportar el contenido del archivo binario a un archivo de texto denominado: ”SinStock.txt”,
+//con aquellos celulares que tengan stock 0.
+procedure exportarArchivoBinarioATextoStock0(var arc: archivo_celulares);
+var
+   arcText: Text;
+   c: celular;
+
+begin
+     reset(arc);
+     assign(arcText, 'SinStock.txt');
+     rewrite(arcText);
+     while (not EOF(arc)) do begin
+           read(arc, c);
+           if (c.stockDisponible = 0) then begin
+              writeln(arcText, c.codigo, ' ', c.precio:0:2, ' ', c.marca);
+              writeln(arcText, c.stockDisponible, ' ', c.stockMinimo, ' ', c.descripcion);
+              writeln(arcText, c.nombre);
+           end;
+     end;
+     close(arc);
+     close(arcText);
+end;
 
 // MENU DE OPCIONES:
 procedure menuOpciones(var arc: archivo_celular; var arcText: Text);
@@ -172,8 +195,8 @@ begin
     writeln('3: Listar en pantalla los celulares del archivo cuya descripción contenga una cadena de caracteres proporcionada por el usuario.');
     writeln('4: Exportar el archivo binario creado en el inciso a) a un archivo de texto denominado “celulares.txt” con todos los celulares del mismo. ');
     writeln('5: Añadir uno o más celulares al final del archivo con sus datos ingresados por teclado.');
-    writeln('6: .');
-    writeln('7: .');
+    writeln('6: Modificar el stock de un celular dado..');
+    writeln('7: Exportar el contenido del archivo binario a un archivo de texto denominado: ”SinStock.txt”, con aquellos celulares que tengan stock 0.');
     writeln('8: Salir del menú.');
     writeln('Elija una opción: ');
     readln(opcion);

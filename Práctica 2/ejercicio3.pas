@@ -25,64 +25,87 @@ type
         totalEncuestados: integer;
     end;
     
-    archivoAlfabetizacion = file of alfabetizacion;
-    archivoAgencia = file of agencia;
-    
+    archivoAlfabetizacion = file of infoAlfabetizacion;
+    archivoAgencia = file of infoAgencia;
 
-procedure leerInfoAgencia(var arcDet: archivoAgencia; var iAg: infoAgencia);
+
+
+procedure leerInfoAgencia(var arcDet: archivoAgencia; var regD: infoAgencia);
 begin
-    if (not EOF (arcDet)) then 
-        read(arcDet, iAg);
+    if (not EOF(arcDet)) then 
+        read(arcDet, regD)   
     else    
-        iAg.provincia = valorAlto;
+        regD.provincia := valorAlto;  
 end;
 
-procedure minimo(var arcDet1, arcDet2: archivoAgencia; var iAg1, iAg2, min: infoAgencia);
+
+
+procedure minimo(var arcDet1, arcDet2: archivoAgencia; 
+                 var regD1, regD2, min: infoAgencia);
 begin
-    if(iAg1.nombre <= iAg2.nombre) then begin
-            min := iAg1;
-            leer(arcDet1, iAg1);
+    if (regD1.provincia <= regD2.provincia) then begin
+        min := regD1;                       
+        leerInfoAgencia(arcDet1, regD1);   
     end
     else begin
-        min := iAg2;
-        leer(arcDet2, iAg2);
+        min := regD2;                       
+        leerInfoAgencia(arcDet2, regD2);     
     end;
 end;
 
-procedure actualizarMaestro(var arcDet1, arcDet2: archivoAgencia; var arcMae: archivoAlfabetizacion);
+
+
+procedure actualizarMaestro(var arcDet1, arcDet2: archivoAgencia; 
+                            var arcMae: archivoAlfabetizacion);
 var 
-    iAg1, iag2, min: infoAgencia;
-    iAlf: infoAlfabetizacion;
+    regD1, regD2, min: infoAgencia;   
+    regM: infoAlfabetizacion;        
+    provinciaActual: string[25];      
+    totalAlf, totalEnc: integer;      
 begin
-    reset(arcDet1);
-    reset(arcDet2)
-    reset(arcMae);
-    leerInfoAgencia(arcDet1, iAg1);
-    leerInfoAgencia(arcDet2, iAg2);
-    
-    minimo(arcDet1, arcDet2, iAg1, iAg2, min);
-    while (min.provincia <> valorAlto) do begin 
-        read(arcMae, iAlf);
-        while (iAlf.provincia <> min.provincia) do
-            read(arcMae, iAlf);
-        while (iAlf.provincia = min.provincia) do begin 
-            iAlf.cantidadAlfabetizados := iAlf.cantidadAlfabetizados + min.cantidadAlfabetizados;
-            iAlf.totalEncuestados := iAlf.totalEncuestados + min.totalEncuestados;
-            minimo(arcDet1, arcDet2, iAg1, iAg2, min);
+    reset(arcDet1);   
+    reset(arcDet2);  
+    reset(arcMae);   
+
+    leerInfoAgencia(arcDet1, regD1);  
+    leerInfoAgencia(arcDet2, regD2); 
+
+    minimo(arcDet1, arcDet2, regD1, regD2, min); 
+
+    while (min.provincia <> valorAlto) do begin  
+        provinciaActual := min.provincia;
+        totalAlf := 0;
+        totalEnc := 0;
+        
+        while (min.provincia = provinciaActual) do begin
+            totalAlf := totalAlf + min.cantidadAlfabetizados;  
+            totalEnc := totalEnc + min.totalEncuestados;        
+            minimo(arcDet1, arcDet2, regD1, regD2, min);
         end;
-        seek(arcMae, filepos(arcMae)-1);
-        write(arcMae, iAlf);
+
+        read(arcMae, regM);   
+        while (regM.provincia <> provinciaActual) do
+            read(arcMae, regM);   
+
+        regM.cantidadAlfabetizados := regM.cantidadAlfabetizados + totalAlf;
+        regM.totalEncuestados := regM.totalEncuestados + totalEnc;
+
+        seek(arcMae, filepos(arcMae)-1);   
+        write(arcMae, regM);             
     end;
+
     close(arcDet1);
     close(arcDet2);
     close(arcMae);
 end;
-    
-    
-var
-    detalle: archivoAgencia;
-    maestro: archivoAlfabetizacion;
-begin
 
+var
+    detalle1, detalle2: archivoAgencia;
+    maestro: archivoAlfabetizacion;
+
+begin
+    assign(detalle1, 'detalle 1');  
+    assign(detalle2, 'detalle 2');   
+    assign(maestro, 'maestro');    
+    actualizarMaestro(detalle1, detalle2, maestro);
 end.
-    

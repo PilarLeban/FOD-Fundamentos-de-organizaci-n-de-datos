@@ -45,19 +45,13 @@ begin
 		leer(vecArc[pos], vecReg[pos]);
 end;
 
-{procedure crearArchivoTexto(var arcMae: archivoMaestro);
-var
-	p: productoMaestro;
-	
-	reset(arcMae);
-	rewrite(arcText);
-	while (not EOF (arcMae)) do begin
-		read(arcMae, p);
-		
-	end;
-	close(arcMae);
-	close(arcText);
-end;}
+procedure leerMaestro(var arcMae: archivoMaestro; var regM: productoMaestro);
+begin
+	if (not EOF (arcMae)) then 
+		read(arcMae, regM);
+	else
+		regM.codigo = valorAlto;
+end;
 
 procedure actualizarMaestro(var arcMae: archivoMaestro; var vecArc: vectorArchivos);
 var
@@ -83,8 +77,8 @@ begin
 	rewrite(arcText);
 	
 	minimo(vecArc, vecReg, min);
-	read(arcMae, regM);
-	while (not EOF (arcMae)) do begin // recorrer por maestro
+	leerMaestro(arcMae, regM);
+	while (regM.codigo <> valorAlto) do begin 
 		codigoActual := min.codigo;
 		cantVendidas := 0;
 		
@@ -95,7 +89,7 @@ begin
 		while (regM.codigo <> codigoActual) do begin
 			if (regM.stockDisponible < regM.stockMinimo) then 
 				writeln(arcText, regM.nombre, '', regM.descripcion, '', regM.stockDisponible, '', regM.precio);
-			read(arcMae, regM);
+			leerMaestro(arcMae, regM);
 		end;
 		
 		seek(arcMae, filepos(arcMae) - 1);
@@ -104,11 +98,20 @@ begin
 	
 		if (regM.stockDisponible < regM.stockMinimo) then 
 			writeln(arcText, regM.nombre, '', regM.descripcion, '', regM.stockDisponible, '', regM.precio);
-		read(arcMae, regM);
+		leerMaestro(arcMae, regM);
 	end;
-	// crearArchivoTexto(arcMae);
 	close(arcMae);
 	close(arcText);
 	for i := 1 to dimF do
 		close(vecArc[i]);
 end;
+
+// programa principal
+
+var
+	vecArc: vectorArchivos;
+	maestro: archivoMaestro;
+begin
+	actualizarMaestro(maestro, vecArc);
+end.
+

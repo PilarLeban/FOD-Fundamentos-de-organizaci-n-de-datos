@@ -31,7 +31,7 @@ begin
         prodDet.codigo := valorAlto;
 end;
 
-procedure minimo(var vecArc: vectorArchivos; var vectorRegistros; var min: productoDetalle);
+procedure minimo(var vecArc: vectorArchivos; var vecReg: vectorRegistros; var min: productoDetalle);
 var
 	i, pos: integer;
 begin

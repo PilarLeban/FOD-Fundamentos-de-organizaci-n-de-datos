@@ -41,6 +41,7 @@ begin
 			min := vecReg[i];
 			pos := i;
 		end;
+	end;
 	if (min.codigo <> valorAlto) then
 		leer(vecArc[pos], vecReg[pos]);
 end;

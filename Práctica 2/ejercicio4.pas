@@ -38,7 +38,7 @@ begin
 	min.codigo := valorAlto;
 	for i := 1 to dimF do begin 
 		if (vecReg[i].codigo < min.codigo) then begin
-			min.codigo := vecReg[i];
+			min := vecReg[i];
 			pos := i;
 		end;
 	if (min.codigo <> valorAlto) then
